@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 
 from pathlib import Path
+from scipy import interpolate
 
 import misc
 
@@ -95,11 +96,72 @@ def figure_02():
     )
 
     plt.plot(
-        data_ptuv_2017["Data"],
-        data_ptuv_2017["Temperatura Máxima (ºC)"],
+        data_ptuv["Data"],
+        data_ptuv["Temperatura Máxima (ºC)"],
         "--",
         color="black",
         alpha=0.7,
     )
 
     return None
+
+
+def _check_date(date):
+    """Helping function. Will check if input date is complete, and fill it
+    with not.
+    """
+    len_date = len(date.split("-"))
+    if len_date == 3:
+        # date has YYYY-MM-DD
+        return pd.to_datetime(date)
+    elif len_date == 2:  # date has YYYY-MM; will consider DD = "01"
+        return pd.to_datetime(date + "-01")
+    elif len_date == 1:  # date has YYYY; will consider MM-DD = "01-01"
+        return pd.to_datetime(date + "-01-01")
+
+
+def _return_data_interval(data, start, stop):
+    """
+    """
+    start = _check_date(start)
+    stop = _check_date(stop)
+
+    data_eq_before = data.Data >= stop
+    data_eq_after = data.Data >= start
+
+    data_in_interval = data[(data_eq_before) & (data_eq_after)]
+
+    return data_in_interval
+
+
+def _plot_pluv(axis, start, stop, num=40):
+    """
+    """
+    data = data_ptuv
+    data_in_interval = _return_data_interval(data, start,stop)
+
+    data_int_step = data_in_interval["Precipitação Diária (mm)"][::num]
+
+    x_axis = np.linspace(start=start, 
+                         stop=stop,
+                         num=len(data_int_step),
+                         endpoint=True)
+
+    func_interp = interpolate.interp1d(x_axis,
+                                       data_int_step,
+                                       kind="cubic")
+    axis.plot(data_in_interval["Data"][::num],
+              func_interp(x_axis),
+              color="blue")
+
+    return axis
+
+
+def _plot_temp(axis, start, stop, num=40):
+    """
+    """
+    data = data_ptuv
+    start = _check_date(start)
+    stop = _check_date(stop)
+
+    return axis
