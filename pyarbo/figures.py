@@ -5,7 +5,7 @@ FIGURES.PY
 Notes
 -----
 
-Please add the private data to `../data`, or change the value of BASE_PATH.
+Please add the private data to `../data`, or change the value of `BASE_PATH`.
 """
 
 import matplotlib.pyplot as plt
@@ -30,14 +30,13 @@ BASE_PATH = Path("../data")
 
 FILENAME_DENGUE = BASE_PATH / "dengue_cases-2010_2022.csv"
 FILENAME_MOSQUITO = BASE_PATH / "mosq_aaeg_trap_pos-2017_2022.csv"
-FILENAME_PTUV = (
-    BASE_PATH
-    / "Precipitação - Temperatura - Umidade - Vento - 2010 a 2022.xlsx"
-)  # In `FILENAME_PTUV`, NULL elements are represented as `'     '`
+FILENAME_WEATHER = BASE_PATH / "weather-2010_2022.csv"
 
 data_dengue = pd.read_csv(io=FILENAME_DENGUE)
 data_mosquito = pd.read_excel(io=FILENAME_MOSQUITO)
-data_ptuv = pd.read_excel(io=FILENAME_PTUV, na_values="     ")
+
+# In `FILENAME_WEATHER`, NULL elements are represented as `'     '`
+data_weather = pd.read_excel(io=FILENAME_WEATHER, na_values="     ")
 
 
 def figure_01():
@@ -59,27 +58,7 @@ def figure_01():
     axes[2].set_xlabel("lab_confirmed")
 
     for ax in axes:
-        ax.plot(
-            data_ptuv["Data"],
-            data_ptuv["Temperatura Média (ºC)"],
-            "--",
-            color="black",
-            alpha=0.5,
-        )
-        ax.plot(
-            data_ptuv["Data"],
-            data_ptuv["Temperatura Máxima (ºC)"],
-            "--",
-            color="black",
-            alpha=0.7,
-        )
-        ax.plot(
-            data_ptuv["Data"],
-            data_ptuv["Temperatura Mínima (ºC)"],
-            "--",
-            color="black",
-            alpha=0.3,
-        )
+        ax._plot_temp(axis=ax, start="2010-01-01", stop="2010-01-01")
     return None
 
 
@@ -96,8 +75,8 @@ def figure_02():
     )
 
     plt.plot(
-        data_ptuv["Data"],
-        data_ptuv["Temperatura Máxima (ºC)"],
+        data_weather["date"],
+        data_weather["temp_max-celsius"],
         "--",
         color="black",
         alpha=0.7,
@@ -121,8 +100,7 @@ def _check_date(date):
 
 
 def _return_data_interval(data, start, stop):
-    """
-    """
+    """ """
     start = _check_date(start)
     stop = _check_date(stop)
 
@@ -135,33 +113,60 @@ def _return_data_interval(data, start, stop):
 
 
 def _plot_pluv(axis, start, stop, num=40):
-    """
-    """
-    data = data_ptuv
-    data_in_interval = _return_data_interval(data, start,stop)
+    """ """
+    data = data_weather
+    data_in_interval = _return_data_interval(data, start, stop)
 
-    data_int_step = data_in_interval["Precipitação Diária (mm)"][::num]
+    data_int_step = data_in_interval["daily_precipitation-mm"][::num]
 
-    x_axis = np.linspace(start=start, 
-                         stop=stop,
-                         num=len(data_int_step),
-                         endpoint=True)
+    x_axis = np.linspace(
+        start=start, stop=stop, num=len(data_int_step), endpoint=True
+    )
 
-    func_interp = interpolate.interp1d(x_axis,
-                                       data_int_step,
-                                       kind="cubic")
-    axis.plot(data_in_interval["Data"][::num],
-              func_interp(x_axis),
-              color="blue")
+    func_interp = interpolate.interp1d(x_axis, data_int_step, kind="cubic")
+    axis.plot(
+        data_in_interval["Data"][::num], func_interp(x_axis), color="blue"
+    )
 
     return axis
 
 
-def _plot_temp(axis, start, stop, num=40):
+def _plot_temp(axis, start, stop):
+    """Auxiliary function. Will return an axis with min, mean and max
+    temperatures between `start` and `stop` dates.
     """
-    """
-    data = data_ptuv
-    start = _check_date(start)
-    stop = _check_date(stop)
+    data = data_weather
+    data_in_interval = _return_data_interval(data, start, stop)
+
+    axis.plot(
+        data_in_interval["date"],
+        data_in_interval["temp_min-celsius"],
+        "--",
+        color="black",
+        alpha=0.7,
+    )
+    axis.plot(
+        data_in_interval["date"],
+        data_in_interval["temp_mean-celsius"],
+        "--",
+        color="black",
+        alpha=0.7,
+    )
+    axis.plot(
+        data_in_interval["date"],
+        data_in_interval["temp_max-celsius"],
+        "--",
+        color="black",
+        alpha=0.7,
+    )
+
+    # filling area between min and max temperature.
+    axis.fill_between(
+        data_in_interval["date"],
+        data_in_interval["temp_min-celsius"],
+        data_in_interval["temp_max-celsius"],
+        facecolor="gray",
+        alpha=0.2,
+    )
 
     return axis
