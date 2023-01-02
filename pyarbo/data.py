@@ -38,7 +38,7 @@ def data_ptuv(filename="data_ptuv.csv"):
     return data
 
 
-def data_dengue_cases(filename="data_dengue.csv"):
+def classified_dengue_cases(filename="data_dengue.csv"):
     """ """
 
     data = data.dropna()
@@ -71,7 +71,7 @@ def data_dengue_cases(filename="data_dengue.csv"):
     return data
 
 
-def data_mosquito(filename="mosq_aaeg_trap_pos-2017_2022.csv"):
+def total_mosquitos_traps(filename="mosq_aaeg_trap_pos-2017_2022.csv"):
     """
 
     Notes
