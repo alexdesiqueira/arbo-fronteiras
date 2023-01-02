@@ -41,17 +41,32 @@ def data_ptuv(filename="data_ptuv.csv"):
 def data_dengue_cases(filename="data_dengue.csv"):
     """ """
 
-    data_notific_class = data_notific_class.dropna()
+    data = data.dropna()
 
-    data_notific_class = data_dengue[["dt_sin_pri", "classi_fin", "criterio"]]
+    data = data_dengue[["dt_sin_pri", "classi_fin", "criterio"]]
 
-    data_notific_class["dt_sin_pri"] = pd.to_datetime(
-        data_notific_class["dt_sin_pri"]
+    data["dt_sin_pri"] = pd.to_datetime(
+        data["dt_sin_pri"]
     )
 
-    data_notific_class = data_notific_class[
-        data_notific_class["dt_sin_pri"] >= "2010-01-01"
+    data = data[
+        data["dt_sin_pri"] >= "2010-01-01"
     ]
+
+    data = misc.classify_dengue_cases(data)
+
+    # adding three more columns: "notified", "probable", "lab_confirmed", with their values
+    dummy_data = pd.get_dummies(data["type"])
+    data = pd.concat([data, dummy_data], axis=1)
+
+    # aggregating data according to "DT_SIN_PRI"
+    data = data.groupby(["dt_sin_pri"], as_index=True)[
+        ["notified",
+         "probable",
+         "lab_confirmed"]].sum()
+
+    data = misc.fill_missing_dates(data,
+                                   format="%Y-%m-%d")
 
     return data
 
