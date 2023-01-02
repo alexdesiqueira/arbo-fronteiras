@@ -12,7 +12,6 @@ Please add the private data to `../data`, or change the value of BASE_PATH.
 import misc
 import pandas as pd
 
-from dbfread import DBF
 from pathlib import Path
 
 
@@ -27,7 +26,7 @@ FILENAME_PTUV = (
 )
 
 data_dengue = pd.read_excel(io=FILENAME_SINAN_DENGUE)
-data_mosquito = _read_data_mosquito_dbf(filename=FILENAME_ARMADILHAS_DBF)
+data_mosquito = misc._read_data_mosquito_dbf(filename=FILENAME_ARMADILHAS_DBF)
 data_mosquito_pos = pd.read_excel(io=FILENAME_MOSQUITO_POS)
 data_ptuv = pd.read_excel(io=FILENAME_PTUV, na_values="     ")
 
@@ -141,14 +140,4 @@ def total_mosquitos_traps(filename="mosq_aaeg_trap_pos-2017_2022.csv"):
 
     if filename is not None:
         data.to_csv(filename)
-    return data
-
-
-def _read_data_mosquito_dbf(filename=FILENAME_ARMADILHAS_DBF):
-    """
-    Helping function. Reads and returns DBF mosquito data.
-    """
-    data_dbf = DBF(filename)
-    data = pd.DataFrame(iter(data_dbf))
-
     return data

@@ -1,3 +1,5 @@
+from dbfread import DBF
+
 import pandas as pd
 
 
@@ -54,5 +56,15 @@ def classify_dengue_cases(data):
 
     class_mask = class_not_5 & criterio_is_1
     data[class_mask]["type"] = "lab_confirmed"
+
+    return data
+
+
+def _read_data_mosquito_dbf(filename=FILENAME_ARMADILHAS_DBF):
+    """
+    Helping function. Reads and returns DBF mosquito data.
+    """
+    data_dbf = DBF(filename)
+    data = pd.DataFrame(iter(data_dbf))
 
     return data
