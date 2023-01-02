@@ -29,7 +29,7 @@ def fill_missing_dates(data, format="%Y-%m-%d"):
     return data
 
 
-def return_dengue_cases(data):
+def classify_dengue_cases(data):
     """Return dengue cases, classified in notified, probable, and lab
        confirmed.
 
@@ -45,14 +45,14 @@ def return_dengue_cases(data):
     -----
     Expected columns: "dt_sin_pri", "classi_fin", "criterio"
     """
-    data = data.assign(tipo="notified")
+    data = data.assign(type="notified")
 
     class_not_5 = data["classi_fin"] != 5
     criterio_is_1 = data["criterio"] == 1
 
-    data.loc[:, (class_not_5, "tipo")] = "probable"
+    data.loc[:, (class_not_5, "type")] = "probable"
 
-    dengue_mask = class_not_5 & criterio_is_1
-    data[dengue_mask]["tipo"] = "lab_confirmed"
+    class_mask = class_not_5 & criterio_is_1
+    data[class_mask]["type"] = "lab_confirmed"
 
     return data
