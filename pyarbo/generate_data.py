@@ -9,26 +9,9 @@ Notes
 Please add the private data to `../data`, or change the value of BASE_PATH.
 """
 
+import constants
 import misc
 import pandas as pd
-
-from pathlib import Path
-
-
-BASE_PATH = Path("../data")
-
-FILENAME_SINAN_DENGUE = BASE_PATH / "sinan_dengue_2010_2022.xlsx"
-FILENAME_MOSQUITO_POS = BASE_PATH / "mosquitos positivos 2017 a 2022.xlsx"
-FILENAME_ARMADILHAS_DBF = BASE_PATH / "armadilhas_liraa_XY.dbf"
-FILENAME_PTUV = (
-    BASE_PATH
-    / "Precipitação - Temperatura - Umidade - Vento - 2010 a 2022.xlsx"
-)
-
-data_dengue = pd.read_excel(io=FILENAME_SINAN_DENGUE)
-data_mosquito = misc._read_data_mosquito_dbf(filename=FILENAME_ARMADILHAS_DBF)
-data_mosquito_pos = pd.read_excel(io=FILENAME_MOSQUITO_POS)
-data_ptuv = pd.read_excel(io=FILENAME_PTUV, na_values="     ")
 
 
 def data_ptuv(filename="data_ptuv.csv"):
@@ -141,3 +124,12 @@ def total_mosquitos_traps(filename="mosq_aaeg_trap_pos-2017_2022.csv"):
     if filename is not None:
         data.to_csv(filename)
     return data
+
+
+if __name__ == "__main__":
+    print("* reading raw data...")
+    data_dengue = pd.read_excel(io=constants.FILENAME_SINAN_DENGUE)
+    data_mosquito = misc._read_data_mosquito_dbf(filename=constants.FILENAME_ARMADILHAS_DBF)
+    data_mosquito_pos = pd.read_excel(io=constants.FILENAME_MOSQUITO_POS)
+    data_ptuv = pd.read_excel(io=constants.FILENAME_PTUV, na_values="     ")
+    print("* done.")
