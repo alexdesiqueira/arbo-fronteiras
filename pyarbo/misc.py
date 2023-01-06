@@ -1,5 +1,6 @@
 from dbfread import DBF
 
+import constants
 import pandas as pd
 
 
@@ -60,7 +61,7 @@ def classify_dengue_cases(data):
     return data
 
 
-def _read_data_mosquito_dbf(filename=FILENAME_ARMADILHAS_DBF):
+def _read_data_mosquito_dbf(filename=constants.FILENAME_ARMADILHAS_DBF):
     """
     Helping function. Reads and returns DBF mosquito data.
     """
